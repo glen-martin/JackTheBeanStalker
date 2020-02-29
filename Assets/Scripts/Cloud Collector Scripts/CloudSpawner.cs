@@ -7,6 +7,8 @@ public class CloudSpawner : MonoBehaviour
     [SerializeField]
     private GameObject[] clouds;
 
+    [SerializeField]
+    private GameObject[] collectibles;
     private float distanceBtwClouds = 3f;
 
     private float minX, maxX;
@@ -15,7 +17,7 @@ public class CloudSpawner : MonoBehaviour
 
     private float controlX;
 
-    private GameObject[] collectibles;
+    private bool hasTouchedCloudYet = false;
 
     private GameObject player;
     // Start is called before the first frame update
@@ -24,6 +26,7 @@ public class CloudSpawner : MonoBehaviour
         controlX = 0;
         setMinAndMaxX();
         CreateClouds();
+        DeactivateCollectables();
         player = GameObject.Find("Player");
     }
 
@@ -34,6 +37,12 @@ public class CloudSpawner : MonoBehaviour
     void Start()
     {
         PositionPlayer();
+    }
+
+    void DeactivateCollectables(){
+        foreach(GameObject collectable in collectibles){
+            collectable.SetActive(false);
+        }
     }
 
     void setMinAndMaxX()
@@ -139,6 +148,10 @@ public class CloudSpawner : MonoBehaviour
     {
         if (other.tag == "Cloud" || other.tag == "Deadly")
         {
+            if(!hasTouchedCloudYet){
+                player.GetComponent<PlayerScore>().InitializeCounting();
+                hasTouchedCloudYet = true;
+            }
             if (other.transform.position.y == lastCloudPositionY)
             {
                 Shuffle(clouds);
@@ -175,6 +188,25 @@ public class CloudSpawner : MonoBehaviour
 
                         clouds[i].transform.position = temp;
                         clouds[i].gameObject.SetActive(true);
+
+                        if(clouds[i].tag != "Deadly"){
+                            int collectableIndex = Random.Range(0, collectibles.Length);
+                            GameObject currCollectible = collectibles[collectableIndex];
+                            if(!currCollectible.activeInHierarchy){
+
+                                if(currCollectible.tag == "Life"){
+                                    // Not giving more than 2 lifes
+                                    if(PlayerScore.lifeCount >= 2){
+                                        return;
+                                    }
+                                }
+                                Vector3 collectablePos = clouds[i].transform.position;
+                                // Some space btw the cloud and the collectible
+                                collectablePos.y += 0.7f;
+                                currCollectible.transform.position = collectablePos;
+                                currCollectible.SetActive(true);
+                            }
+                        }
                     }
                 }
             }

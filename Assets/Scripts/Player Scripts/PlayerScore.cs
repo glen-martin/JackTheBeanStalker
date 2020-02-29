@@ -7,7 +7,7 @@ public class PlayerScore : MonoBehaviour
     [SerializeField]
     private AudioClip coinClip, lifeClip;
 
-    private bool countScore;
+    private bool countScore = false;
     private CameraScript cameraScript;
     private Vector3 prevPos;
 
@@ -28,7 +28,7 @@ public class PlayerScore : MonoBehaviour
     void Start()
     {
         prevPos = transform.position;
-        countScore = true;
+        countScore = false;
     }
 
     // Update is called once per frame
@@ -51,10 +51,19 @@ public class PlayerScore : MonoBehaviour
         {
             if (transform.position.y < prevPos.y)
             {
-                scoreCount += 1 * Time.deltaTime;
+                // TODO: Default score is 70 because the player moves a bit before hitting the first cloud.
+                scoreCount += Mathf.RoundToInt(Mathf.Abs(prevPos.y - transform.position.y) * 10);
             }
             prevPos = transform.position;
+            GameplayController.instance.SetScore(scoreCount);
         }
+    }
+
+    public void InitializeCounting(){
+        countScore = true;
+        // Since score is calculated based on distance moved also,
+        // re-setting the prevPos to the currentPos should ensure 0 score at the beginning
+        prevPos = transform.position;
     }
 
     /// <summary>
@@ -72,19 +81,30 @@ public class PlayerScore : MonoBehaviour
             AudioSource.PlayClipAtPoint(coinClip, transform.position);
             other.gameObject.SetActive(false);
 
+            GameplayController.instance.SetCoinScore(coinCount);
+            GameplayController.instance.SetScore(scoreCount);
+
         }
         else if (other.tag == "Deadly")
         {
-            lifeCount -= 1;
+            lifeCount --;
             cameraScript.moveCamera = false;
             countScore = false;
             Vector3 newPos = new Vector3(500, 500 ,0);
             transform.position = newPos;
+
+            GameManager.instance.CheckGameStatus(scoreCount, coinCount, lifeCount);
         }
         else if (other.tag == "Life")
         {
             lifeCount++;
             scoreCount += 300;
+            AudioSource.PlayClipAtPoint(lifeClip, transform.position);
+            other.gameObject.SetActive(false);
+
+            GameplayController.instance.SetLifeScore(lifeCount);
+            GameplayController.instance.SetScore(scoreCount);
+
         }
         else if (other.tag == "Bounds")
         {
@@ -93,16 +113,7 @@ public class PlayerScore : MonoBehaviour
             lifeCount--;
             Vector3 newPos = new Vector3(500, 500 ,0);
             transform.position = newPos;
+            GameManager.instance.CheckGameStatus(scoreCount, coinCount, lifeCount);
         }
-
-        if (lifeCount <= 0)
-        {
-            Die();
-        }
-    }
-
-    void Die()
-    {
-
     }
 }

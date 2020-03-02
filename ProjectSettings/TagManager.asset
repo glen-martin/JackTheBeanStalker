@@ -10,6 +10,7 @@ TagManager:
   - Bounds
   - Life
   - Coin
+  - Transition
   layers:
   - Default
   - TransparentFX

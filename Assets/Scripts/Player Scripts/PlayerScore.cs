@@ -59,7 +59,8 @@ public class PlayerScore : MonoBehaviour
         }
     }
 
-    public void InitializeCounting(){
+    public void InitializeCounting()
+    {
         countScore = true;
         // Since score is calculated based on distance moved also,
         // re-setting the prevPos to the currentPos should ensure 0 score at the beginning
@@ -85,16 +86,6 @@ public class PlayerScore : MonoBehaviour
             GameplayController.instance.SetScore(scoreCount);
 
         }
-        else if (other.tag == "Deadly")
-        {
-            lifeCount --;
-            cameraScript.moveCamera = false;
-            countScore = false;
-            Vector3 newPos = new Vector3(500, 500 ,0);
-            transform.position = newPos;
-
-            GameManager.instance.CheckGameStatus(scoreCount, coinCount, lifeCount);
-        }
         else if (other.tag == "Life")
         {
             lifeCount++;
@@ -106,12 +97,12 @@ public class PlayerScore : MonoBehaviour
             GameplayController.instance.SetScore(scoreCount);
 
         }
-        else if (other.tag == "Bounds")
+        else if (other.tag == "Bounds" || other.tag == "Deadly")
         {
             cameraScript.moveCamera = false;
             countScore = false;
             lifeCount--;
-            Vector3 newPos = new Vector3(500, 500 ,0);
+            Vector3 newPos = new Vector3(500, 500, 0);
             transform.position = newPos;
             GameManager.instance.CheckGameStatus(scoreCount, coinCount, lifeCount);
         }

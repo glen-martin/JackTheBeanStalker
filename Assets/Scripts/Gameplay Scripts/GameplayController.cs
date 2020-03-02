@@ -48,7 +48,7 @@ public class GameplayController : MonoBehaviour
 
     public void QuitGame(){
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Main Menu");
+        FaderController.instance.LoadLevel("Main Menu");
     }
 
     public void SetCoinScore(float score){

@@ -7,6 +7,11 @@ public class CameraScript : MonoBehaviour
     private float speed = 1f;
     private float acceleration = 0.2f;
     private float maxSpeed = 3.2f;
+
+    private float easySpeed = 3.2f;
+    private float mediumSpeed = 4.2f;
+
+    private float hardSpeed = 5.2f;
     
     [HideInInspector]
     public bool moveCamera ;
@@ -14,6 +19,17 @@ public class CameraScript : MonoBehaviour
     void Start()
     {
         moveCamera = true;
+
+        if(GamePreferences.GetEasyDifficulty() == 1){
+            maxSpeed = easySpeed;
+        }
+        if(GamePreferences.GetMediumDifficulty() == 1){
+            maxSpeed = mediumSpeed;
+        }
+        if(GamePreferences.GetHardDifficulty() == 1){
+            maxSpeed = hardSpeed;
+        }
+
     }
 
     // Update is called once per frame
